@@ -3,7 +3,6 @@
 
 execute pathogen#infect()
 
-colorscheme void
 syntax on
 
 set sessionoptions-=options
@@ -17,9 +16,12 @@ set smarttab
 set nu
 set scrolloff=5
 
+let g:livepreview_previewer = 'evince'
+
+colorscheme google
+
 set showcmd
 set autoindent
-set background=dark
 set showmatch
 set cursorline
 set novisualbell
@@ -42,7 +44,7 @@ noremap <C-L> :tabnext<CR>
 noremap <C-H> :tabprevious<CR>
 inoremap kj <Esc>
 inoremap <Esc> <NOP>
-set timeout timeoutlen=300
+set timeout timeoutlen=100
 
 
 nnoremap <space> i
