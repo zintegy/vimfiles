@@ -1,11 +1,9 @@
-# echo "hello!"
 export EDITOR=~/nvim-linux-x86_64.appimage
 for f in `find /shared_envs/ -name ".*.sh"`; do if [ -f $f ]; then source $f; fi; done
 export ANS_ROOT="${ANS_ROOT:-/home/ydeng/ans}"
 alias vim=nvim
 alias nvim=~/nvim-linux-x86_64.appimage
 
-#source /home/ydeng/ans/etc/bashrc
 export ANS_DEFAULT_INSTANCE=dwc
 source $HOME/git-prompt.sh
 export PATH=/home/ydeng/bin:$PATH
@@ -13,6 +11,8 @@ export PATH=/home/ydeng/ans/venv:$PATH
 export PATH=/home/ydeng/.local/bin:$PATH
 
 export PATH="$HOME/go/bin:$PATH"
+# Prefer the bun installed under ~/.bun over any system bun in /usr/local/bin.
+export PATH="$HOME/.bun/bin:$PATH"
 
 # unset PYTHONHOME
 # unset pythonhome
@@ -284,10 +284,19 @@ claude() {
 codex() {
     tmux_tab_color 220 130 70
     trap 'true' INT
-    # First call: trigger lazy nvm load so `command codex` is on PATH.
-    # __work removes itself after running, so this is a no-op afterwards.
+    # First call: trigger lazy nvm load.
     declare -f __work >/dev/null && __work
-    command codex "$@"
+    # codex was npm-installed-globally under a specific node version, so it
+    # only lives in that version's bin/. Find it directly rather than going
+    # through PATH, which changes when `nvm use` switches versions (e.g.
+    # ~/poe2 pins to a node version that wasn't used to install codex).
+    local codex_bin
+    codex_bin=$(ls -d /home/ydeng/.nvm/versions/node/*/bin/codex 2>/dev/null | head -1)
+    if [ -n "$codex_bin" ]; then
+        "$codex_bin" "$@"
+    else
+        command codex "$@"
+    fi
     local rc=$?
     trap - INT
     tmux_tab_color_reset
@@ -456,6 +465,7 @@ pint() { cd "$(_repo_root)/poe/web_internal/src"; }
 
 
 alias bns="cd ~/bns"
+alias cns="cd ~/cns"
 
 
 #export PYTHONHOME='/home/ydeng/ans/venv3.9'
@@ -529,3 +539,4 @@ memory () {
 wt() {
     source use-worktree "$@"
 }
+export LESSSECURE=1

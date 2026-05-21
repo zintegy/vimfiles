@@ -201,6 +201,7 @@ alias review="gh pr review"
 alias sourcezsh="source ~/.zshrc"
 alias gl="git gl"
 alias claude-summary="python3 ~/.claude/scripts/daily_summary.py"
+alias poe2="cd ~/poe2 && nvm use"
 
 autoload -Uz compinit
 for dump in ~/.zcompdump(N.mh+24); do
@@ -214,3 +215,28 @@ request() {
   gh pr review "$1" -r -b "${msg:-comments}"
 }
 
+
+# bun completions
+[ -s "/home/ydeng/.bun/_bun" ] && source "/home/ydeng/.bun/_bun"
+
+# Auto-run `nvm use` when entering any directory tree containing a .nvmrc.
+# Tracks the last-used .nvmrc dir so we only switch when crossing into a new
+# project, not on every `cd` within it.
+autoload -U add-zsh-hook
+_last_nvmrc_dir=""
+_auto_nvm_use() {
+    local dir="$PWD"
+    while [[ "$dir" != "/" && "$dir" != "$HOME" ]]; do
+        if [[ -f "$dir/.nvmrc" ]]; then
+            if [[ "$dir" != "$_last_nvmrc_dir" ]]; then
+                _last_nvmrc_dir="$dir"
+                nvm use >/dev/null 2>&1
+            fi
+            return
+        fi
+        dir="${dir:h}"  # zsh syntax for dirname
+    done
+}
+add-zsh-hook chpwd _auto_nvm_use
+# Trigger once at shell startup so opening a tab directly into poe2 works.
+_auto_nvm_use
