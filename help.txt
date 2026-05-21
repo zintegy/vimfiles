@@ -1,0 +1,10 @@
+cp .bashrc ~
+cp .tmux.conf ~
+cp .vimrc ~
+cp .zshrc ~
+
+#git prompt from https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
+# also have to get oh-my-zsh from  https://github.com/ohmyzsh/ohmyzsh/wiki
+# zsh autosuggestions: https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
+# zsh syntax highlighting: https://github.com/zsh-users/zsh-syntax-highlighting
+# powerlevel 10k: https://github.com/romkatv/powerlevel10k
