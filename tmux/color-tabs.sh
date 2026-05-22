@@ -23,15 +23,29 @@ color_window() {
 }
 
 apply_colors() {
-    tmux list-windows -F '#{window_id} #{window_name}' 2>/dev/null | while read -r id name; do
-        echo "  window $id name=$name" >> "$LOG"
+    # If $1 is given, only color that single window; otherwise iterate all.
+    if [ -n "$TARGET_WINDOW" ]; then
+        local name=$(tmux display-message -p -t "$TARGET_WINDOW" '#{window_name}' 2>/dev/null)
+        echo "  scoped to window $TARGET_WINDOW name=$name" >> "$LOG"
         case "$name" in
-            dev)    color_window "$id" 111 161 241 ;;
-            mis)    color_window "$id" 234 116 104 ;;
-            claude) color_window "$id" 235 175 90  ;;
+            dev)    color_window "$TARGET_WINDOW" 111 161 241 ;;
+            mis)    color_window "$TARGET_WINDOW" 234 116 104 ;;
+            claude) color_window "$TARGET_WINDOW" 235 175 90  ;;
         esac
-    done
+    else
+        tmux list-windows -F '#{window_id} #{window_name}' 2>/dev/null | while read -r id name; do
+            echo "  window $id name=$name" >> "$LOG"
+            case "$name" in
+                dev)    color_window "$id" 111 161 241 ;;
+                mis)    color_window "$id" 234 116 104 ;;
+                claude) color_window "$id" 235 175 90  ;;
+            esac
+        done
+    fi
 }
+
+# Optional first arg: scope to a single window_id (used by after-new-window).
+TARGET_WINDOW="$1"
 
 # Apply twice -- once after a short delay (catches typical case) and again
 # after a longer delay (catches slow-starting TUIs like `mia` that override
